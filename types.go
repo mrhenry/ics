@@ -1111,24 +1111,34 @@ func (t *Text) aencode(w writer) {
 }
 
 func (t Text) encode(w writer) {
-	d := make([]byte, 0, len(t)+256)
-	var ru [4]byte
-	for _, c := range t {
-		switch c {
-		case '\\':
-			d = append(d, '\\', '\\')
-		case '\n':
-			d = append(d, '\\', 'n')
-		case ';':
-			d = append(d, '\\', ';')
-		case ',':
-			d = append(d, '\\', ',')
-		default:
-			l := utf8.EncodeRune(ru[:], c)
-			d = append(d, ru[:l]...)
-		}
-	}
-	w.Write(d)
+	s := string(t)
+	s = strings.Replace(s, `\r\n`, `<br><br>`, -1)
+	s = strings.Replace(s, `\r`, `<br>`, -1)
+	s = strings.Replace(s, `\n`, `<br>`, -1)
+	s = strings.Replace(s, `\`, `\\`, -1)
+	s = strings.Replace(s, `;`, `\;`, -1)
+	s = strings.Replace(s, `,`, `\,`, -1)
+	s = strings.Replace(s, `<br><br>`, `\r\n`, -1)
+	s = strings.Replace(s, `<br>`, `\n`, -1)
+
+	// d := make([]byte, 0, len(t)+256)
+	// var ru [4]byte
+	// for _, c := range t {
+	// 	switch c {
+	// 	case '\\':
+	// 		d = append(d, '\\', '\\')
+	// 	case '\n':
+	// 		d = append(d, '\\', 'n')
+	// 	case ';':
+	// 		d = append(d, '\\', ';')
+	// 	case ',':
+	// 		d = append(d, '\\', ',')
+	// 	default:
+	// 		l := utf8.EncodeRune(ru[:], c)
+	// 		d = append(d, ru[:l]...)
+	// 	}
+	// }
+	w.Write([]byte(s))
 }
 
 func (t Text) valid() error {
